@@ -1,0 +1,3 @@
+.env
+__pycache__/ # si es Python
+.DS_Store
