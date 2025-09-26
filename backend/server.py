@@ -93,7 +93,7 @@ def optionAnswerChat(optionChat):
     if optionChat == "📚 Información de la Biblioteca":
         return f'Seleccionaste la opción <strong>'+optionChat+'</strong> Indicame tus dudas institucionales sobre la Biblioteca Alonso Gamero por favor. Ejemplo: Dirección, Horario, Normas, Servicios ofrecidos, Historia, entre otros.'
     elif optionChat == "📖 Buscar libros o recursos":
-        return f'Seleccionaste la opción <strong>'+optionChat+'</strong> ¿Buscas un libro o recurso en específico? Indicame el título, autor, área o tema y reviso si está disponible en la Biblioteca Alonso Gamero.'
+        return f'Seleccionaste la opción <strong>'+optionChat+'</strong> ¿Buscas un libro o recurso en específico? Sé lo más específico posible, indicame el título, autor, área, año o tema y reviso si está disponible en la Biblioteca Alonso Gamero. Ejemplo: Libros de la editorial Springer.'
     elif optionChat == "🧠 Recomendaciones bibliográficas":
         return f'Seleccionaste la opción <strong>'+optionChat+'</strong> Indicame sobre que tópico te gustaría mi recomendación. Sé lo más específico posible: tema, autor, carrera o materia. ¡Así te puedo dar las mejores sugerencias!'
     elif optionChat == "📑 Crear informe o contenido":
@@ -484,7 +484,7 @@ def callGroqPDF(prompt):
     data = {
         "model": "llama-3.1-8b-instant",
         "messages": [
-            {"role": "system", "content": ("Eres un asistente que resume textos largos de forma clara y concisa, que incluye todas las ideas principales, pero sin exceder 500 palabras."
+            {"role": "system", "content": ("Eres un asistente que resume textos largos de forma clara y concisa, que incluye todas las ideas principales, pero sin exceder 800 palabras."
             "Evita usar asteriscos (*) para resaltar texto o crear listas. Usa texto plano y saltos de línea únicamente con \n para separar los elementos o párrafos y mejorar la legibilidad."
             "No agregues información que no esta en el texto que te envió el usuario"
             "Agregale un título como primera línea")},
@@ -623,13 +623,17 @@ def human_query_to_sql(human_query: str):
     Retorna la consulta SQL en una estructura JSON con la clave `"sql_query"`.
     Condiciones:
     - Solo puedes hacer consultas del tipo SELECT. Si el usuario solicita una acción diferente, debes responder que no está permitido.
-    - Para hacer búsquedas insensibles a mayúsculas, minúsculas o acentos, debes usar en el where lo siguiente: `UPPER(UNACCENT(columna)) LIKE UPPER(UNACCENT('%VALOR%'))`, sin incluirle \ al LIKE, donde el valor es la información requerida, no le agregues UPPER(UNACCENT()) al nombre de la tabla donde se buscara la información.
-    - La consulta debe retornar solo un máximo de 15 filas, por lo tanto, debes incluir `LIMIT 15` al final.
+    - **Nunca modifiques el nombre de la tabla ni le apliques funciones como UPPER o UNACCENT.**
+    - Utiliza LIKE para buscar el valor, Ejemplo ('%Lopez%') 
+    - Para hacer búsquedas insensibles a mayúsculas, minúsculas o acentos, aplica `UPPER(UNACCENT(...))` **solo a las columnas** dentro de la cláusula WHERE y al valor de búsqueda.  
+    Ejemplo correcto:
+    `SELECT * FROM recursos_libros WHERE UPPER(UNACCENT(autor)) LIKE UPPER(UNACCENT('%Lopez%')) LIMIT 15`
+    - La consulta debe retornar solo un máximo de 15 filas, por lo tanto, incluye `LIMIT 15` al final.
     - No incluyas punto y coma (`;`) al final de la consulta.
-    - Retorna unicamente lo que te estoy solicitando como en el ejemplo que te muestro a continuacion
+    - Retorna únicamente lo que te estoy solicitando, como en el siguiente ejemplo:
     <example>{{
-        "sql_query": "SELECT * FROM UPPER(UNACCENT(recursos_libros)) WHERE autor like UPPER(UNACCENT("%Lopez%")) LIMIT 15"
-        "original_query": "Enseñame todos los libros del autor Lopez."
+        "sql_query": "SELECT * FROM recursos_libros WHERE UPPER(UNACCENT(autor)) LIKE UPPER(UNACCENT('%Lopez%')) LIMIT 15",
+        "original_query": "Enséñame todos los libros del autor Lopez."
     }}
     </example>
     <schema>
@@ -657,15 +661,13 @@ def human_query_to_sql(human_query: str):
 
 #Genero la respuesta final
 def build_answer(result, human_query: str):
-    print('LA construccion')
-    print(human_query)
     system_message = f"""
     Eres un asistente bibliotecario. Dadas la pregunta del usuario y el json de la respuesta SQL de la base de datos, responde de manera clara y útil.
     Si no se obtuvieron resultados del SQL, indícale al usuario que no se encontraron registros en la biblioteca y ofrécele una información alternativa.
     Presenta cada registro del json como un ítem independiente separandolo con un salto de línea usando la etiqueta <br>.
     Usa texto plano.
     No uses asteriscos, viñetas ni listas numeradas. Evita decorar el texto.
-    Si la consulta del usuario te pide eliminar o actualizar indicale que no esta permitida esta acción.
+    Si la consulta del usuario te pide eliminar o actualizar indicale que no puedes realizar esta acción.
     <user_question> 
     {human_query}
     </user_question>

@@ -48,7 +48,7 @@
 		{#if !selectedDate || selectedDate === today}
 			{#if lastMessage && chatLength>1 && !showOpt && !isAQuestion && message.type === 1 }
 				<div class="extra-message">
-					<p class="extra-text">¿Hay algo más en lo que te pueda ayudar sobre esta opción?, recuerda que no tengo acceso al contexto previo, es decir, <strong>no tengo memoria</strong>, ¿o deseas ver el Menú de Opciones? --></p>
+					<p class="extra-text">¿Hay algo más en lo que te pueda ayudar sobre esta opción?, recuerda que no tengo acceso al contexto previo, es decir, <strong>no tengo memoria</strong>, por lo que debes ser específico(a), ¿o deseas ver el Menú de Opciones? --></p>
 					<button class="btn btn-primary extra" on:click={() => optionSelectedMenu("Ver Opciones")}>Ver Opciones</button>
 				</div>
 			{/if}

@@ -1281,7 +1281,7 @@ var app = (function () {
     			t0 = text("¿Hay algo más en lo que te pueda ayudar sobre esta opción?, recuerda que no tengo acceso al contexto previo, es decir, ");
     			strong = element("strong");
     			strong.textContent = "no tengo memoria";
-    			t2 = text(", ¿o deseas ver el Menú de Opciones? -->");
+    			t2 = text(", por lo que debes ser específico(a), ¿o deseas ver el Menú de Opciones? -->");
     			t3 = space();
     			button = element("button");
     			button.textContent = "Ver Opciones";
@@ -1289,7 +1289,7 @@ var app = (function () {
     			attr_dev(p, "class", "extra-text svelte-15drrj2");
     			add_location(p, file$9, 50, 5, 2680);
     			attr_dev(button, "class", "btn btn-primary extra svelte-15drrj2");
-    			add_location(button, file$9, 51, 5, 2904);
+    			add_location(button, file$9, 51, 5, 2940);
     			attr_dev(div, "class", "extra-message svelte-15drrj2");
     			add_location(div, file$9, 49, 4, 2647);
     		},
